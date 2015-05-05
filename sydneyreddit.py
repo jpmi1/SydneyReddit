@@ -51,7 +51,7 @@ def tweet_creator(subreddit_info):
 def setup_connection_reddit(subreddit):
     time = datetime.datetime.now().time()
     print "[bot] Start time: " + str(time) + "\n[bot] Setting up connection with Reddit"
-    r = praw.Reddit('SydneyReddit' 'monitoring %s' %subreddit)
+    r = praw.Reddit('SydneyReddit' 'monitoring %s' % subreddit)
     subreddit = r.get_subreddit(subreddit)
     return subreddit
 
