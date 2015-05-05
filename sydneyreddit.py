@@ -1,3 +1,4 @@
+# coding=utf-8
 import praw
 import json
 import requests
@@ -24,6 +25,7 @@ def main():
             print "[bot] Exception caught - Sleeping 10 secs"
             time.sleep(10)
 
+
 def tweet_creator(subreddit_info):
     post_dict = {}
     post_ids = []
@@ -45,12 +47,14 @@ def tweet_creator(subreddit_info):
             print "[bot] Skipped generating short URL"
             return False, False
 
+
 def setup_connection_reddit(subreddit):
     time = datetime.datetime.now().time()
     print "[bot] Start time: " + str(time) + "\n[bot] Setting up connection with Reddit"
-    r = praw.Reddit('SydneyReddit' 'monitoring %s' % (subreddit))
+    r = praw.Reddit('SydneyReddit' 'monitoring %s' %subreddit)
     subreddit = r.get_subreddit(subreddit)
     return subreddit
+
 
 def shorten(url):
     print "[bot] Starting URL shortening process"
@@ -66,10 +70,11 @@ def shorten(url):
     link = json.loads(r.text)['id']
     return link
 
+
 def duplicate_check(id):
     print "[bot] Checking for duplicates"
     found = False
-    with open('posted_posts.txt', 'r') as file:
+    with open('posted_posts.txt') as file:
         lines = file.readlines()
         if id in lines[-1]:
             print "[bot] Duplicate found"
@@ -78,16 +83,20 @@ def duplicate_check(id):
             print "[bot] Duplicate not found"
     return found
 
+
 def add_id_to_file(id):
     print "[bot] Adding post to posted_posts.txt : " + str(id)
     with open('posted_posts.txt', 'a') as file:
         file.write(str(id) + "\n")
+    file.close()
+
 
 def strip_title(title):
     if len(title) < 115:
         return title
     else:
         return title[:114] + "..."
+
 
 def tweeter(post_dict, post_ids):
     f = open('SydneyReddit.txt')
@@ -101,18 +110,10 @@ def tweeter(post_dict, post_ids):
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
     for post, post_id in zip(post_dict, post_ids):
-        # found = duplicate_check(post)
-        # if found == 0:
         print "[bot] Posting the following on twitter"
         print post.encode('ascii', 'ignore') + " " + post_dict[post] + " #Sydney"
         api.update_status(status=post.encode('ascii', 'ignore') + " " + post_dict[post] + " #Sydney")
         add_id_to_file(post.encode('ascii', 'ignore'))
-        print "[bot] Sleeping for 10 secs"
-        time.sleep(10)
-        # else:
-        #     print "[bot] Already posted"
-        #     print "[bot] Sleeping for 10 secs"
-        #     time.sleep(10)
 
 if __name__ == '__main__':
     main()
